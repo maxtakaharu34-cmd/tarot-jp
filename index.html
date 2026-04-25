@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+<meta name="theme-color" content="#15082a" />
+<title>夜のタロット</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet"/>
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+body {
+  font-family: "Shippori Mincho", "Cormorant Garamond", serif;
+  color: #f4ecd8;
+  background:
+    radial-gradient(800px 500px at 30% 10%, rgba(180,80,200,0.3), transparent 70%),
+    radial-gradient(800px 500px at 70% 90%, rgba(80,40,180,0.4), transparent 70%),
+    linear-gradient(180deg, #2a0e3f 0%, #08020e 100%);
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, #fff 50%, transparent 100%),
+    radial-gradient(1px 1px at 60% 70%, #fff 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 80% 20%, #fff 50%, transparent 100%),
+    radial-gradient(1px 1px at 15% 80%, #fff 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 90% 50%, #fff 50%, transparent 100%);
+  background-size: 400px 400px; opacity: 0.5;
+  animation: drift 80s linear infinite;
+}
+@keyframes drift { from { background-position: 0 0; } to { background-position: 400px 400px; } }
+#app {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  height: 100dvh; padding: 14px 16px; gap: 14px;
+  max-width: 480px; margin: 0 auto;
+}
+header { display: flex; justify-content: space-between; align-items: center; }
+.title {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 28px; font-weight: 700; letter-spacing: 0.08em;
+  margin: 0; color: #ffd56b;
+  text-shadow: 0 0 12px rgba(255,213,107,0.5);
+}
+.title .sub { display: block; font-size: 11px; opacity: 0.7; letter-spacing: 0.4em; }
+.icon-btn {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,213,107,0.35); color: #ffd56b;
+  padding: 6px 12px; border-radius: 999px; font-size: 12px; cursor: pointer;
+  font-family: inherit;
+}
+.intro { text-align: center; font-size: 13px; opacity: 0.8; line-height: 1.7; }
+
+/* Card stage */
+.stage {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; min-height: 0;
+}
+.deck {
+  width: 100%; height: 100%; max-width: 380px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.shuffling {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.shuffling .card {
+  position: absolute; width: 80px; height: 130px;
+  background: linear-gradient(135deg, #4a1f6e, #15082a);
+  border: 2px solid #ffd56b;
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.7), 0 0 16px rgba(255,213,107,0.2);
+}
+.shuffling .card::before {
+  content: "✦"; position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffd56b; font-size: 22px;
+  text-shadow: 0 0 8px #ffd56b;
+}
+.shuffling.go .card {
+  animation: shuf 1.6s ease-in-out;
+}
+.shuffling .c1 { animation-delay: 0s; }
+.shuffling .c2 { animation-delay: 0.1s; }
+.shuffling .c3 { animation-delay: 0.2s; }
+.shuffling .c4 { animation-delay: 0.3s; }
+.shuffling .c5 { animation-delay: 0.4s; }
+@keyframes shuf {
+  0%   { transform: translate(0, 0) rotate(0); }
+  20%  { transform: translate(-60px, -10px) rotate(-12deg); }
+  50%  { transform: translate(60px, 10px) rotate(12deg); }
+  80%  { transform: translate(-30px, -5px) rotate(-6deg); }
+  100% { transform: translate(0, 0) rotate(0); }
+}
+
+.spread {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+  width: 100%;
+}
+.slot {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.slot .pos {
+  font-size: 11px; letter-spacing: 0.2em; color: #ffd56b; opacity: 0.85;
+}
+.slot .card {
+  position: relative;
+  width: 100%; aspect-ratio: 80 / 130;
+  border: 2px solid #ffd56b;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #4a1f6e, #15082a);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.7), 0 0 14px rgba(255,213,107,0.25);
+  display: flex; align-items: center; justify-content: center;
+  perspective: 600px;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+.slot .card.flipped { transform: rotateY(180deg); }
+.slot .card .face, .slot .card .back {
+  position: absolute; inset: 0;
+  border-radius: 6px;
+  backface-visibility: hidden;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 6px; text-align: center;
+}
+.slot .card .back {
+  background: linear-gradient(135deg, #4a1f6e, #15082a);
+  border: 1px solid rgba(255,213,107,0.35);
+}
+.slot .card .back::before {
+  content: "✦"; color: #ffd56b; font-size: 28px;
+  text-shadow: 0 0 8px #ffd56b;
+}
+.slot .card .face {
+  background: linear-gradient(180deg, #fff5d8, #f0d8a8);
+  color: #2a0e3f;
+  transform: rotateY(180deg);
+  border: 1px solid #b8860b;
+}
+.slot .card .face .num {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 14px; opacity: 0.6; font-weight: 700;
+}
+.slot .card .face .em {
+  font-size: 36px; line-height: 1; margin: 4px 0;
+}
+.slot .card .face .nm {
+  font-family: "Shippori Mincho", serif;
+  font-size: 12px; font-weight: 700; line-height: 1.3;
+}
+.slot .card.reversed .face { transform: rotateY(180deg) rotate(180deg); }
+.slot.active .card { box-shadow: 0 6px 18px rgba(0,0,0,0.7), 0 0 22px rgba(255,213,107,0.6); }
+
+.draw-btn {
+  background: linear-gradient(180deg, #6a30a8 0%, #2c0e44 100%);
+  border: 2px solid #ffd56b; color: #ffd56b;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 18px; letter-spacing: 0.2em; font-weight: 700;
+  padding: 12px 28px; border-radius: 999px; cursor: pointer;
+  box-shadow: 0 0 16px rgba(255,213,107,0.4);
+  text-shadow: 0 0 8px rgba(255,213,107,0.6);
+}
+.draw-btn:disabled { opacity: 0.4; cursor: wait; }
+.draw-btn:active { transform: scale(0.97); }
+
+/* Reading */
+.reading {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,213,107,0.3);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: none;
+}
+.reading.show { display: block; }
+.reading h3 {
+  margin: 0 0 4px;
+  font-family: "Cormorant Garamond", serif;
+  color: #ffd56b; font-size: 14px; letter-spacing: 0.2em;
+}
+.reading .item {
+  border-top: 1px solid rgba(255,213,107,0.15);
+  padding: 8px 0;
+}
+.reading .item:first-of-type { border-top: 0; }
+.reading .item .pos {
+  font-size: 10px; color: #ffd56b; letter-spacing: 0.2em;
+}
+.reading .item .ttl {
+  font-family: "Shippori Mincho", serif;
+  font-size: 14px; margin: 2px 0 4px;
+  color: #fff;
+}
+.reading .item .desc { font-size: 12px; line-height: 1.65; opacity: 0.85; }
+.reading .actions { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+.reading .actions button {
+  background: rgba(255,213,107,0.15); color: #ffd56b;
+  border: 1px solid rgba(255,213,107,0.4);
+  padding: 6px 14px; border-radius: 999px;
+  font-family: inherit; font-size: 12px; cursor: pointer;
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1 class="title">Tarot<span class="sub">夜のタロット</span></h1>
+    <button class="icon-btn" id="btn-reset">↺ 引き直す</button>
+  </header>
+  <div class="intro">深く息を吸い、聞きたいことを心の中で…<br/>カードがあなたに語りかけます</div>
+  <div class="stage">
+    <div class="deck" id="deck">
+      <div class="spread" id="spread">
+        <div class="slot"><div class="pos">過去</div><div class="card" data-i="0"><div class="back"></div><div class="face"></div></div></div>
+        <div class="slot"><div class="pos">現在</div><div class="card" data-i="1"><div class="back"></div><div class="face"></div></div></div>
+        <div class="slot"><div class="pos">未来</div><div class="card" data-i="2"><div class="back"></div><div class="face"></div></div></div>
+      </div>
+      <div class="shuffling" id="shuf" style="display:none;">
+        <div class="card c1"></div><div class="card c2"></div><div class="card c3"></div><div class="card c4"></div><div class="card c5"></div>
+      </div>
+    </div>
+    <button class="draw-btn" id="btn-draw">✦ Draw 3 Cards ✦</button>
+  </div>
+  <div class="reading" id="reading">
+    <h3>READING</h3>
+    <div id="reading-body"></div>
+    <div class="actions">
+      <button id="btn-share">🔗 シェア</button>
+      <button id="btn-redraw">引き直す</button>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+  'use strict';
+  const SHARE_URL = 'https://maxtakaharu34-cmd.github.io/tarot-jp/';
+  // 22 Major Arcana with two-sided meanings
+  const CARDS = [
+    {n:0,  em:'🃏', nm:'愚者',     up:'純粋な始まり、無垢な冒険心', rev:'無謀さ、見切り発車'},
+    {n:1,  em:'🎩', nm:'魔術師',   up:'創造、意思の力、可能性', rev:'欺瞞、力の濫用'},
+    {n:2,  em:'🌙', nm:'女教皇',   up:'直感、内なる声、神秘', rev:'秘密の隠蔽、迷い'},
+    {n:3,  em:'👑', nm:'女帝',     up:'豊かさ、母性、創造の実り', rev:'依存、停滞'},
+    {n:4,  em:'⚜️', nm:'皇帝',     up:'権威、安定、決断力', rev:'頑固、支配欲'},
+    {n:5,  em:'⛪', nm:'教皇',     up:'伝統、助言、信頼', rev:'独善、慣習からの逸脱'},
+    {n:6,  em:'💞', nm:'恋人',     up:'愛、選択、調和', rev:'迷い、不協和'},
+    {n:7,  em:'🛞', nm:'戦車',     up:'勝利、前進、意志', rev:'制御不能、暴走'},
+    {n:8,  em:'🦁', nm:'力',       up:'勇気、優しい強さ、忍耐', rev:'弱気、自己疑念'},
+    {n:9,  em:'🕯️', nm:'隠者',    up:'内省、孤独な探求、知恵', rev:'孤立、頑なさ'},
+    {n:10, em:'🎡', nm:'運命の輪', up:'転機、幸運の到来', rev:'不運、流れに逆らう'},
+    {n:11, em:'⚖️', nm:'正義',     up:'公平、決断、真実', rev:'偏り、不正'},
+    {n:12, em:'🙃', nm:'吊られた男', up:'忍耐、視点の転換、犠牲', rev:'無駄な我慢、停滞'},
+    {n:13, em:'🦴', nm:'死神',     up:'終わりと再生、変容', rev:'抵抗、変化への恐れ'},
+    {n:14, em:'⚗️', nm:'節制',     up:'調和、バランス、癒し', rev:'極端、衝突'},
+    {n:15, em:'😈', nm:'悪魔',     up:'執着、欲望、束縛の自覚', rev:'解放、誘惑からの脱却'},
+    {n:16, em:'🗼', nm:'塔',       up:'激変、解放のための崩壊', rev:'危機の予感、回避不能'},
+    {n:17, em:'⭐', nm:'星',       up:'希望、未来への信頼、霊感', rev:'失望、自信喪失'},
+    {n:18, em:'🌑', nm:'月',       up:'幻想、不安、潜在意識', rev:'真実が見えてくる、混乱の終息'},
+    {n:19, em:'☀️', nm:'太陽',     up:'喜び、成功、生命力', rev:'過信、空回り'},
+    {n:20, em:'📯', nm:'審判',     up:'復活、目覚め、再評価', rev:'過去への執着、後悔'},
+    {n:21, em:'🌍', nm:'世界',     up:'完成、達成、統合', rev:'未完、完成への遅れ'}
+  ];
+  const POS_LABELS = ['過去', '現在', '未来'];
+  const $ = (id) => document.getElementById(id);
+  const cards = document.querySelectorAll('.slot .card');
+  const drawBtn = $('btn-draw');
+  const shuf = $('shuf');
+  const reading = $('reading');
+  const readingBody = $('reading-body');
+  let drawn = null;
+
+  function pickThree() {
+    const pool = CARDS.slice();
+    const out = [];
+    for (let i = 0; i < 3; i++) {
+      const idx = Math.floor(Math.random() * pool.length);
+      const c = pool.splice(idx, 1)[0];
+      out.push({ ...c, reversed: Math.random() < 0.35 });
+    }
+    return out;
+  }
+
+  function applyToSlot(card, c, i) {
+    const face = card.querySelector('.face');
+    while (face.firstChild) face.removeChild(face.firstChild);
+    const num = document.createElement('div'); num.className = 'num'; num.textContent = String(c.n).padStart(2, '0');
+    const em = document.createElement('div'); em.className = 'em'; em.textContent = c.em;
+    const nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = c.nm + (c.reversed ? ' (逆)' : '');
+    face.appendChild(num); face.appendChild(em); face.appendChild(nm);
+    card.classList.toggle('reversed', !!c.reversed);
+  }
+
+  function startDraw() {
+    drawBtn.disabled = true;
+    reading.classList.remove('show');
+    cards.forEach((c) => c.classList.remove('flipped'));
+    shuf.style.display = '';
+    shuf.classList.remove('go'); void shuf.offsetWidth; shuf.classList.add('go');
+    setTimeout(() => {
+      shuf.style.display = 'none';
+      drawn = pickThree();
+      cards.forEach((c, i) => applyToSlot(c, drawn[i], i));
+      cards.forEach((c, i) => setTimeout(() => c.classList.add('flipped'), 300 + i * 350));
+      setTimeout(() => {
+        showReading();
+        drawBtn.disabled = false;
+      }, 1700);
+    }, 1600);
+  }
+
+  function showReading() {
+    while (readingBody.firstChild) readingBody.removeChild(readingBody.firstChild);
+    drawn.forEach((c, i) => {
+      const item = document.createElement('div'); item.className = 'item';
+      const pos = document.createElement('div'); pos.className = 'pos'; pos.textContent = POS_LABELS[i].toUpperCase() + (c.reversed ? ' / 逆位置' : '');
+      const ttl = document.createElement('div'); ttl.className = 'ttl'; ttl.textContent = c.em + ' ' + c.nm;
+      const desc = document.createElement('div'); desc.className = 'desc'; desc.textContent = c.reversed ? c.rev : c.up;
+      item.appendChild(pos); item.appendChild(ttl); item.appendChild(desc);
+      readingBody.appendChild(item);
+    });
+    reading.classList.add('show');
+  }
+
+  drawBtn.addEventListener('click', startDraw);
+  $('btn-redraw').addEventListener('click', startDraw);
+  $('btn-reset').addEventListener('click', startDraw);
+  $('btn-share').addEventListener('click', () => {
+    if (!drawn) return;
+    const txt = `今夜のタロット: ${drawn.map((c, i) => POS_LABELS[i] + '「' + c.nm + (c.reversed ? '(逆)' : '') + '」').join(' / ')} #夜のタロット`;
+    const url = `https://x.com/intent/post?text=${encodeURIComponent(txt)}&url=${encodeURIComponent(SHARE_URL)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  });
+})();
+</script>
+</body>
+</html>
