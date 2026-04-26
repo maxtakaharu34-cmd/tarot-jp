@@ -1,0 +1,18 @@
+{
+  "name": "夜のタロット",
+  "short_name": "タロット",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#15082a",
+  "theme_color": "#15082a",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
